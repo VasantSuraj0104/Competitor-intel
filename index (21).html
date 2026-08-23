@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Competitor intel — Factors.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6.5' fill='%23000'/%3E%3Cg transform='translate(5.385 1.311) scale(0.07986)' fill='%23fff'%3E%3Cpath d='M51.8359 240.595H132.892C132.892 285.361 96.602 321.675 51.8359 321.675V240.595Z'/%3E%3Cpath d='M51.8359 143.402H213.996C213.996 188.182 177.695 224.483 132.916 224.483H51.8359V143.402Z'/%3E%3Cpath d='M51.8359 127.273C51.8359 82.4943 88.1367 46.1936 132.916 46.1936H213.996C213.996 90.9729 177.695 127.273 132.916 127.273H51.8359Z'/%3E%3C/g%3E%3C/svg%3E">
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   ⚙️  THE ONLY LINE YOU EDIT. Paste your n8n Production webhook URL
+       from "Factors Intel 2 — App API" → the "App Request" node.
+   ══════════════════════════════════════════════════════════════════ */
+const ENDPOINT = "https://n8n-api.factors.app/webhook/factors-intel";
+</script>
+
+<style>
+/* ─── tokens ──────────────────────────────────────────────────────
+   Every length below comes from the scale. No ad-hoc values.
+   ───────────────────────────────────────────────────────────────── */
+:root{
+  --ink:#000000; --paper:#0A0A0A; --raised:#131313;
+  --line:#1F1F1F; --line-2:#2E2E2E; --line-3:#404040;
+  --text:#EDEDED; --mute:#909090; --sub:#B0B0B0; --faint:#5E5E5E; --pure:#FFFFFF;
+
+  --sans:"Schibsted Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  /* 4px base */
+  --s1:4px;  --s2:8px;  --s3:12px; --s4:16px; --s5:20px;
+  --s6:24px; --s7:32px; --s8:40px; --s9:56px; --s10:72px;
+
+  /* type scale */
+  --fs-display:clamp(29px,4.8vw,42px);
+  --fs-h2:19px; --fs-lead:16px; --fs-body:15px;
+  --fs-sm:14px; --fs-xs:13px; --fs-micro:11px; --fs-nano:10px; --fs-h3:24px;
+
+  --r-sm:8px; --r:12px; --r-pill:999px;
+  --page:1040px; --gut:52px; --bar:60px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--ink); color:var(--text);
+  font-family:var(--sans); font-size:var(--fs-body); line-height:1.55;
+  letter-spacing:0; -webkit-font-smoothing:antialiased;
+  min-height:100vh; overflow-x:hidden;
+}
+::selection{background:var(--pure);color:var(--ink)}
+:focus-visible{outline:2px solid var(--pure);outline-offset:2px;border-radius:var(--s1)}
+button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+a{color:inherit}
+
+/* mono micro-label — the structural device throughout */
+.tag{
+  font-family:var(--mono); font-size:var(--fs-micro); font-weight:500;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--faint);
+  line-height:1.4;
+}
+
+/* ─── top bar ─────────────────────────────────────────────────── */
+.bar{
+  position:sticky; top:0; z-index:60; background:rgba(0,0,0,.86);
+  backdrop-filter:saturate(180%) blur(14px);
+  -webkit-backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.bar-in{
+  max-width:var(--page); margin:0 auto; padding:0 var(--s5);
+  height:var(--bar); display:flex; align-items:center; gap:var(--s4);
+}
+.mark{display:flex;align-items:center;gap:var(--s3);text-decoration:none;flex-shrink:0;color:var(--pure)}
+.mark .logo{height:18px;width:auto;display:block;fill:currentColor}
+.mark .tool{
+  font-size:var(--fs-xs); font-weight:500; color:var(--mute);
+  padding-left:var(--s3); border-left:1px solid var(--line-2); white-space:nowrap;
+}
+.pip{
+  width:5px;height:5px;border-radius:50%;background:var(--line-3);flex-shrink:0;
+  transition:background .3s var(--ease);
+}
+.pip.live{background:var(--pure);box-shadow:0 0 0 3px rgba(255,255,255,.11)}
+.nav{display:flex;gap:var(--s1);margin-left:auto;min-width:0}
+.nav button{
+  background:none;border:0;cursor:pointer;color:var(--mute);
+  padding:var(--s2) var(--s3); border-radius:var(--r-sm);
+  font-size:var(--fs-xs); font-weight:500; white-space:nowrap;
+  transition:color .15s var(--ease),background .15s var(--ease);
+}
+.nav button:hover{color:var(--text);background:var(--raised)}
+.nav button[aria-current="page"]{color:var(--ink);background:var(--pure);font-weight:500}
+
+/* ─── page ────────────────────────────────────────────────────── */
+.wrap{max-width:var(--page);margin:0 auto;padding:var(--s8) var(--s5) var(--s10)}
+.head{margin-bottom:var(--s7)}
+.head .tag{display:block;margin-bottom:var(--s3)}
+.head h1{
+  font-family:var(--sans); font-size:var(--fs-display); font-weight:400;
+  letter-spacing:-.014em; line-height:1.03; color:var(--pure);
+}
+.head p{
+  color:var(--sub); margin-top:var(--s4); max-width:60ch; font-weight:400;
+  font-size:var(--fs-lead); line-height:1.6; letter-spacing:0;
+}
+
+/* ─── the signature: a diff gutter on every record ────────────── */
+.rec{
+  display:grid; grid-template-columns:var(--gut) 1fr;
+  border:1px solid var(--line); border-radius:var(--r);
+  background:var(--paper); margin-bottom:var(--s3); overflow:hidden;
+  transition:border-color .16s var(--ease),background .16s var(--ease);
+}
+.rec:hover{border-color:var(--line-2);background:var(--raised)}
+.rec-g{
+  border-right:1px solid var(--line); padding:var(--s5) 0;
+  display:flex; flex-direction:column; align-items:center; gap:var(--s2);
+  background:rgba(255,255,255,.015);
+}
+.rec-m{font-family:var(--mono);font-size:var(--fs-h2);font-weight:500;line-height:1;color:var(--faint)}
+.rec-s{
+  font-family:var(--mono); font-size:var(--fs-nano); letter-spacing:.1em;
+  text-transform:uppercase; color:var(--faint);
+  writing-mode:vertical-rl; text-orientation:mixed; transform:rotate(180deg);
+}
+.rec-b{padding:var(--s5);min-width:0;overflow-wrap:anywhere}
+.rec.hot .rec-g{background:var(--pure)}
+.rec.hot .rec-m,.rec.hot .rec-s{color:var(--ink)}
+.rec-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--s2);margin-bottom:var(--s2)}
+.rec-h .who{font-weight:500;font-size:var(--fs-xs);color:var(--pure);letter-spacing:0}
+.rec-t{
+  font-size:var(--fs-h2); font-weight:400; letter-spacing:-.008em;
+  line-height:1.3; color:var(--pure); margin-bottom:var(--s2);
+}
+.rec-t a{text-decoration:none;border-bottom:1px solid var(--line-3)}
+.rec-t a:hover{border-bottom-color:var(--pure)}
+.rec-p{color:var(--sub);font-size:var(--fs-body);line-height:1.55;white-space:pre-line}
+
+/* ─── controls ────────────────────────────────────────────────── */
+.filters{
+  display:flex;gap:var(--s2);flex-wrap:wrap;align-items:center;
+  padding-bottom:var(--s5);margin-bottom:var(--s5);border-bottom:1px solid var(--line);
+}
+.chip{
+  background:transparent;border:1px solid var(--line-2);color:var(--mute);
+  padding:var(--s2) var(--s4);border-radius:var(--r-pill);cursor:pointer;
+  font-size:var(--fs-xs);font-weight:500;transition:all .15s var(--ease);
+}
+.chip:hover{border-color:var(--line-3);color:var(--text)}
+.chip[aria-pressed="true"]{background:var(--pure);border-color:var(--pure);color:var(--ink);font-weight:500}
+.btn{
+  background:var(--pure);color:var(--ink);border:1px solid var(--pure);
+  padding:var(--s3) var(--s5);border-radius:var(--r-sm);font-weight:500;
+  font-size:var(--fs-xs);cursor:pointer;transition:opacity .15s var(--ease);
+  min-height:40px;
+}
+.btn:hover:not(:disabled){opacity:.86}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--text);border-color:var(--line-2)}
+.btn.ghost:hover:not(:disabled){border-color:var(--line-3);background:var(--raised);opacity:1}
+.btn.rec-on{background:var(--pure);color:var(--ink)}
+
+label.lbl{display:block;margin-bottom:var(--s2)}
+.fld{
+  width:100%;background:var(--paper);border:1px solid var(--line-2);
+  border-radius:var(--r-sm);padding:var(--s3) var(--s4);color:var(--text);
+  font-size:var(--fs-body);transition:border-color .15s var(--ease);min-height:44px;
+}
+.fld:focus{outline:none;border-color:var(--line-3);box-shadow:0 0 0 3px rgba(255,255,255,.05)}
+.fld::placeholder{color:var(--faint)}
+textarea.fld{resize:vertical;min-height:144px;line-height:1.6;font-family:inherit}
+select.fld{
+  appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23909090' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right var(--s4) center;padding-right:var(--s8);
+}
+.row{display:grid;gap:var(--s5);margin-bottom:var(--s5)}
+@media(min-width:641px){.row.two{grid-template-columns:1fr 1fr}}
+
+/* ─── recorder ────────────────────────────────────────────────── */
+.mic{
+  border:1px dashed var(--line-2);border-radius:var(--r);padding:var(--s4);
+  display:flex;align-items:center;gap:var(--s4);flex-wrap:wrap;
+}
+.mic.armed{border-style:solid;border-color:var(--pure)}
+.meter{display:flex;align-items:center;gap:2px;height:var(--s6);flex:1 1 120px;min-width:0}
+.meter i{display:block;flex:1 1 auto;max-width:3px;background:var(--line-3);border-radius:2px;height:3px;
+  transition:height .09s linear,background .09s linear}
+.clock{font-family:var(--mono);font-size:var(--fs-xs);color:var(--mute);min-width:44px}
+
+/* ─── review ──────────────────────────────────────────────────── */
+.gate{max-width:360px;margin:var(--s10) auto;text-align:center}
+.gate h2{font-size:var(--fs-h3);font-weight:400;letter-spacing:0;color:var(--pure);margin-bottom:var(--s2)}
+.gate p{color:var(--sub);font-size:15px;line-height:1.5;margin-bottom:var(--s6)}
+.gate .fld{margin-bottom:var(--s2);text-align:left}
+.card{border:1px solid var(--line);border-radius:var(--r);background:var(--paper);margin-bottom:var(--s3);overflow:hidden}
+.card-h{
+  padding:var(--s4);display:flex;gap:var(--s3);align-items:flex-start;
+  cursor:pointer;user-select:none;background:none;border:0;width:100%;text-align:left;
+}
+.card-h:hover{background:var(--raised)}
+.card-h .tw{flex:1;min-width:0;overflow-wrap:anywhere}
+.card-h .tt{font-weight:400;font-size:var(--fs-sm);color:var(--pure);letter-spacing:-.005em;margin-bottom:var(--s1)}
+.caret{color:var(--faint);font-family:var(--mono);font-size:var(--fs-xs);
+  transition:transform .2s var(--ease);flex-shrink:0;margin-top:2px}
+.card.open .caret{transform:rotate(90deg)}
+.card-b{border-top:1px solid var(--line);padding:var(--s5);display:none}
+.card.open .card-b{display:block}
+.state{
+  font-family:var(--mono);font-size:var(--fs-nano);letter-spacing:.1em;text-transform:uppercase;
+  padding:var(--s1) var(--s2);border-radius:var(--s1);border:1px solid var(--line-2);
+  color:var(--mute);flex-shrink:0;white-space:nowrap;
+}
+.state.go{background:var(--pure);border-color:var(--pure);color:var(--ink)}
+.state.wait{border-style:dashed}
+.sub{margin-bottom:var(--s4)}
+.sub .tag{display:block;margin-bottom:var(--s2)}
+.diff{border-left:2px solid var(--line-2);padding-left:var(--s4);margin-bottom:var(--s6)}
+.dline{font-family:var(--mono);font-size:var(--fs-xs);line-height:1.7;color:var(--faint);
+  white-space:pre-wrap;overflow-wrap:anywhere}
+.dline b{color:var(--mute);font-weight:500}
+.bul{display:flex;gap:var(--s3);align-items:flex-start;margin-bottom:var(--s2)}
+.bul .plus{font-family:var(--mono);color:var(--pure);font-size:var(--fs-sm);
+  padding-top:var(--s3);flex-shrink:0;width:var(--s3)}
+.bul textarea{
+  flex:1;min-width:0;background:var(--paper);border:1px solid var(--line-2);
+  border-radius:var(--r-sm);padding:var(--s3);font-size:var(--fs-xs);line-height:1.6;
+  resize:vertical;min-height:48px;font-family:inherit;color:var(--pure);
+}
+.bul textarea:focus{outline:none;border-color:var(--line-3)}
+.bul .x{
+  background:none;border:1px solid var(--line-2);color:var(--faint);border-radius:var(--r-sm);
+  width:var(--s7);height:var(--s7);cursor:pointer;flex-shrink:0;margin-top:var(--s1);
+  font-size:var(--fs-sm);line-height:1;
+}
+.bul .x:hover{border-color:var(--pure);color:var(--pure)}
+.acts{display:flex;gap:var(--s2);flex-wrap:wrap;align-items:center;
+  margin-top:var(--s6);padding-top:var(--s5);border-top:1px solid var(--line)}
+.acts .spacer{flex:1 1 auto}
+.mini{padding:var(--s2) var(--s3);font-size:var(--fs-xs);min-height:var(--s7)}
+
+/* ─── collateral ──────────────────────────────────────────────── */
+.doc{border:1px solid var(--line);border-radius:var(--r);background:var(--paper);
+  padding:var(--s6);margin-bottom:var(--s3)}
+.doc h3{font-size:var(--fs-h2);font-weight:400;letter-spacing:-.011em;color:var(--pure);margin-bottom:var(--s1)}
+.doc ul{list-style:none;margin-top:var(--s4)}
+.doc li{display:flex;gap:var(--s4);padding:var(--s3) 0;border-bottom:1px solid var(--line);
+  font-size:var(--fs-body);line-height:1.6;overflow-wrap:anywhere}
+.doc li:last-child{border-bottom:0}
+.doc li .d{font-family:var(--mono);font-size:var(--fs-micro);color:var(--faint);
+  flex:0 0 var(--s10);padding-top:3px}
+
+/* ─── feedback ────────────────────────────────────────────────── */
+.empty{border:1px dashed var(--line-2);border-radius:var(--r);
+  padding:var(--s10) var(--s6);text-align:center;color:var(--sub);
+  font-size:15px;line-height:1.55}
+.empty strong{display:block;color:var(--pure);font-weight:400;font-size:var(--fs-h2);
+  letter-spacing:-.008em;margin-bottom:var(--s2)}
+.msg{border:1px solid var(--line-2);border-left:2px solid var(--pure);border-radius:var(--r-sm);
+  padding:var(--s3) var(--s4);font-size:var(--fs-xs);line-height:1.6;
+  margin-bottom:var(--s4);color:var(--text)}
+.msg.bad{background:rgba(255,255,255,.04)}
+.toast{
+  position:fixed;left:50%;bottom:var(--s6);transform:translate(-50%,var(--s10));
+  background:var(--pure);color:var(--ink);padding:var(--s3) var(--s5);border-radius:var(--r-pill);
+  font-size:var(--fs-xs);font-weight:500;z-index:200;opacity:0;pointer-events:none;
+  transition:transform .3s var(--ease),opacity .3s var(--ease);
+  max-width:calc(100vw - var(--s8));text-align:center;
+}
+.toast.up{transform:translate(-50%,0);opacity:1}
+.skel{height:var(--s10);border-radius:var(--r);background:var(--paper);
+  border:1px solid var(--line);margin-bottom:var(--s3);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:.85}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+code{font-family:var(--mono);font-size:.92em;color:var(--pure)}
+.lnk{background:none;border:0;color:var(--pure);text-decoration:underline;
+  cursor:pointer;font:inherit;padding:0}
+
+/* ─── narrow ──────────────────────────────────────────────────── */
+@media(max-width:900px){
+  .mark .tool{display:none}
+}
+@media(max-width:640px){
+  :root{--gut:40px}
+  .bar-in{padding:0 var(--s4);gap:var(--s3)}
+  .pip{display:none}
+  .mark .logo{height:16px}
+  /* four labels + a wordmark do not fit a 360px bar; let the nav scroll
+     rather than let the page grow a horizontal scrollbar */
+  .nav{gap:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+  .nav::-webkit-scrollbar{display:none}
+  .nav button{padding:var(--s2);font-size:12px}
+  .wrap{padding:var(--s6) var(--s4) var(--s9)}
+  .head{margin-bottom:var(--s6)}
+  .head p{font-size:var(--fs-body);margin-top:var(--s3)}
+  .rec-s{display:none}
+  .rec-g{padding:var(--s4) 0}
+  .rec-b{padding:var(--s4)}
+  .card-b,.doc{padding:var(--s4)}
+  .empty{padding:var(--s9) var(--s4)}
+  .doc li{flex-direction:column;gap:var(--s1)}
+  .doc li .d{flex:none;padding-top:0}
+  .acts .btn{flex:1 1 auto}
+  .acts .spacer{display:none}
+  .gate{margin:var(--s8) auto}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ─── print: the collateral export ────────────────────────────── */
+@media print{
+  .bar,.filters,.acts,.no-print{display:none!important}
+  body{background:#fff;color:#000}
+  .wrap{padding:0;max-width:none}
+  .doc{border:0;background:#fff;padding:0 0 var(--s7);page-break-inside:avoid}
+  .doc h3{color:#000}
+  .doc li{border-bottom:1px solid #E5E5E5}
+  .head h1{color:#000}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <a class="mark" href="#" onclick="go('feed');return false" aria-label="Factors.ai competitor intel — home">
+      <svg class="logo" viewBox="44 38 1325 291" fill="currentColor" role="img" aria-label="Factors.ai" xmlns="http://www.w3.org/2000/svg"><path d="M51.8359 240.595H132.892C132.892 285.361 96.602 321.675 51.8359 321.675V240.595Z"/><path d="M51.8359 143.402H213.996C213.996 188.182 177.695 224.483 132.916 224.483H51.8359V143.402Z"/><path d="M51.8359 127.273C51.8359 82.4943 88.1367 46.1936 132.916 46.1936H213.996C213.996 90.9729 177.695 127.273 132.916 127.273H51.8359Z"/><path d="M381.917 122.12C369.336 122.12 363.045 128.967 363.045 142.663V150.308H398.16V165.901C398.16 170.482 394.447 174.195 389.866 174.195H364V268.619C364 273.2 360.287 276.913 355.706 276.913H334.141V174.195H313.119V158.601C313.119 154.021 316.833 150.308 321.414 150.308H334.141V142.186C334.141 128.49 338.122 117.74 346.085 109.937C354.047 101.974 365.275 97.9928 379.767 97.9928C391.234 97.9928 400.231 100.302 406.76 104.92L402.11 117.41C400.225 122.47 394.026 124.274 388.789 122.959C386.562 122.399 384.271 122.12 381.917 122.12Z"/><path d="M462.479 147.915C481.271 147.915 495.603 152.454 505.477 161.531C515.51 170.449 520.526 183.986 520.526 202.141V268.615C520.526 273.197 516.813 276.909 512.232 276.909H492.339V261.383C488.675 266.957 483.421 271.256 476.572 274.282C469.884 277.148 461.763 278.581 452.207 278.581C442.653 278.581 434.292 276.99 427.124 273.804C419.959 270.46 414.385 265.922 410.403 260.188C406.581 254.296 404.67 247.687 404.67 240.361C404.67 228.895 408.89 219.738 417.331 212.89C425.931 205.883 439.387 202.38 457.701 202.38H490.667V200.469C490.667 191.55 487.959 184.703 482.545 179.925C477.289 175.147 469.407 172.758 458.895 172.758C451.73 172.758 444.643 173.873 437.636 176.103C430.787 178.332 424.975 181.438 420.197 185.419L412.805 169.31C411.186 165.783 412.194 161.546 415.478 159.478C420.449 156.347 425.762 153.951 432.619 151.976C442.015 149.269 451.968 147.915 462.479 147.915ZM458.418 256.844C465.902 256.844 472.512 255.172 478.245 251.827C484.137 248.324 488.278 243.387 490.667 237.017V222.206H459.851C442.653 222.206 434.052 227.86 434.052 239.167C434.052 244.582 436.202 248.882 440.502 252.066C444.802 255.252 450.774 256.844 458.418 256.844Z"/><path d="M606.37 278.581C593.151 278.581 581.287 275.795 570.776 270.221C560.265 264.648 552.064 256.924 546.172 247.05C540.279 237.017 537.333 225.71 537.333 213.129C537.333 200.548 540.279 189.32 546.172 179.447C552.064 169.573 560.185 161.849 570.537 156.276C581.048 150.702 592.992 147.915 606.37 147.915C618.949 147.915 629.939 150.463 639.334 155.559C646.529 159.397 652.37 164.497 656.855 170.862C659.375 174.437 657.894 179.251 654.116 181.454L637.901 190.913C634.238 185.021 629.619 180.642 624.046 177.775C618.631 174.749 612.659 173.236 606.13 173.236C594.983 173.236 585.746 176.899 578.42 184.224C571.094 191.391 567.432 201.025 567.432 213.129C567.432 225.232 571.015 234.947 578.181 242.272C585.506 249.439 594.823 253.022 606.13 253.022C612.659 253.022 618.631 251.589 624.046 248.722C629.619 245.696 634.238 241.237 637.901 235.345L654.027 244.751C657.841 246.976 659.302 251.852 656.73 255.442C652.156 261.822 646.279 266.987 639.095 270.938C629.699 276.034 618.791 278.581 606.37 278.581Z"/><path d="M762.234 264.356C763.547 267.709 762.589 271.621 759.412 273.32C757.043 274.585 754.424 275.623 751.542 276.432C746.607 277.865 741.355 278.582 735.778 278.582C721.765 278.582 710.937 274.919 703.291 267.594C695.647 260.268 691.825 249.598 691.825 235.584V174.191H670.804V158.598C670.804 154.017 674.516 150.304 679.097 150.304H691.825V129.455C691.825 124.874 695.538 121.161 700.119 121.161H721.682V150.304H755.843V165.898C755.843 170.479 752.13 174.191 747.55 174.191H721.682V234.868C721.682 241.078 723.199 245.856 726.225 249.201C729.251 252.385 733.628 253.978 739.363 253.978C746.048 253.978 751.625 252.226 756.084 248.722L762.234 264.356Z"/><path d="M835.001 278.579C822.097 278.579 810.477 275.792 800.124 270.219C789.771 264.645 781.651 256.921 775.758 247.047C770.023 237.014 767.155 225.707 767.155 213.126C767.155 200.545 770.023 189.317 775.758 179.444C781.651 169.57 789.771 161.846 800.124 156.274C810.477 150.699 822.097 147.913 835.001 147.913C848.063 147.913 859.767 150.699 870.112 156.274C880.466 161.846 888.51 169.57 894.244 179.444C900.138 189.317 903.081 200.545 903.081 213.126C903.081 225.707 900.138 237.014 894.244 247.047C888.51 256.921 880.466 264.645 870.112 270.219C859.767 275.792 848.063 278.579 835.001 278.579ZM835.001 253.019C845.988 253.019 855.066 249.356 862.234 242.031C869.403 234.705 872.98 225.07 872.98 213.126C872.98 201.183 869.403 191.547 862.234 184.222C855.066 176.896 845.988 173.233 835.001 173.233C824.014 173.233 814.936 176.896 807.768 184.222C800.757 191.547 797.256 201.183 797.256 213.126C797.256 225.07 800.757 234.705 807.768 242.031C814.936 249.356 824.014 253.019 835.001 253.019Z"/><path d="M946.249 167.981C954.851 154.604 969.981 147.915 991.638 147.915V169.367C991.638 172.991 988.333 175.625 984.711 175.625C973.082 175.625 964.005 179.049 957.477 185.897C950.95 192.585 947.683 202.299 947.683 215.04V268.615C947.683 273.197 943.97 276.909 939.39 276.909H917.823V157.643C917.823 153.062 921.536 149.348 926.116 149.348H946.249V167.981Z"/><path d="M1049.61 278.579C1039.27 278.579 1029.16 277.226 1019.28 274.518C1009.41 271.811 1001.52 268.387 995.629 264.247L1002.87 249.904C1005.12 245.463 1010.74 244.006 1015.24 246.147C1019.01 247.948 1023.15 249.523 1027.64 250.87C1035.76 253.099 1043.73 254.214 1051.53 254.214C1069.36 254.214 1078.28 249.515 1078.28 240.119C1078.28 235.66 1075.97 232.555 1071.35 230.804C1066.89 229.052 1059.65 227.379 1049.61 225.787C1039.11 224.195 1030.51 222.363 1023.82 220.293C1017.29 218.222 1011.55 214.639 1006.62 209.543C1001.84 204.288 999.455 197.042 999.455 187.805C999.455 175.702 1004.47 166.067 1014.5 158.901C1024.7 151.576 1038.39 147.913 1055.59 147.913C1064.35 147.913 1073.1 148.947 1081.86 151.018C1090.63 152.929 1097.79 155.557 1103.36 158.901L1095.88 173.702C1093.73 177.977 1088.41 179.489 1084.01 177.617C1075.25 173.899 1065.69 172.039 1055.35 172.039C1046.59 172.039 1039.9 173.393 1035.28 176.1C1030.82 178.648 1028.6 182.072 1028.6 186.372C1028.6 191.15 1030.98 194.573 1035.76 196.643C1040.7 198.554 1048.26 200.387 1058.46 202.138C1068.64 203.731 1077 205.562 1083.54 207.632C1090.07 209.702 1095.64 213.206 1100.26 218.143C1105.04 223.08 1107.43 230.087 1107.43 239.165C1107.43 251.108 1102.25 260.664 1091.9 267.829C1081.55 274.997 1067.45 278.579 1049.61 278.579Z"/><path d="M1144.61 278.86C1139.2 278.86 1134.57 277.028 1130.75 273.365C1126.93 269.543 1125.02 264.765 1125.02 259.032C1125.02 253.14 1126.85 248.362 1130.51 244.699C1134.34 241.036 1139.04 239.205 1144.61 239.205C1150.19 239.205 1154.8 241.036 1158.46 244.699C1162.28 248.362 1164.2 253.14 1164.2 259.032C1164.2 264.765 1162.28 269.543 1158.46 273.365C1154.64 277.028 1150.03 278.86 1144.61 278.86Z"/><path d="M1237.27 148.194C1256.07 148.194 1270.4 152.732 1280.27 161.81C1290.31 170.728 1295.32 184.264 1295.32 202.419V268.894C1295.32 273.475 1291.61 277.189 1287.03 277.189H1267.14V261.661C1263.47 267.235 1258.21 271.535 1251.37 274.561C1244.68 277.427 1236.56 278.861 1227 278.861C1217.45 278.861 1209.09 277.269 1201.92 274.083C1194.76 270.738 1189.18 266.2 1185.2 260.467C1181.37 254.575 1179.46 247.965 1179.46 240.64C1179.46 229.174 1183.69 220.017 1192.12 213.169C1200.73 206.161 1214.18 202.659 1232.5 202.659H1265.46V200.747C1265.46 191.829 1262.76 184.981 1257.34 180.204C1252.09 175.426 1244.2 173.037 1233.7 173.037C1226.52 173.037 1219.44 174.151 1212.43 176.381C1205.59 178.611 1199.77 181.716 1194.99 185.697L1186.65 170.197C1184.71 166.604 1185.65 162.089 1189.16 160C1194.53 156.793 1200.62 154.212 1207.41 152.254C1216.82 149.548 1226.76 148.194 1237.27 148.194ZM1233.22 257.123C1240.7 257.123 1247.31 255.451 1253.04 252.107C1258.94 248.603 1263.07 243.666 1265.46 237.295V222.485H1234.65C1217.45 222.485 1208.85 228.139 1208.85 239.446C1208.85 244.86 1211 249.161 1215.3 252.345C1219.6 255.53 1225.57 257.123 1233.22 257.123Z"/><path d="M1326.46 157.918C1326.46 153.338 1330.18 149.624 1334.75 149.624H1356.33V268.891C1356.33 273.472 1352.62 277.186 1348.04 277.186H1326.46V157.918ZM1341.52 128.602C1336.11 128.602 1331.56 126.93 1327.9 123.586C1324.24 120.083 1322.41 115.782 1322.41 110.687C1322.41 105.59 1324.24 101.37 1327.9 98.026C1331.56 94.5224 1336.11 92.7703 1341.52 92.7703C1346.93 92.7703 1351.47 94.4425 1355.13 97.7868C1358.8 100.973 1360.62 105.033 1360.62 109.971C1360.62 115.225 1358.8 119.684 1355.13 123.347C1351.63 126.851 1347.09 128.602 1341.52 128.602Z"/></svg>
+      <span class="tool">Competitor intel</span>
+    </a>
+    <span class="pip" id="pip" title="Connection"></span>
+    <nav class="nav" id="nav" aria-label="Sections">
+      <button onclick="go('feed')"       data-p="feed">Feed</button>
+      <button onclick="go('submit')"     data-p="submit">Submit</button>
+      <button onclick="go('review')"     data-p="review">Review</button>
+      <button onclick="go('collateral')" data-p="collateral">Collateral</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="main" role="main"></main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ═══════════════════ state ═══════════════════ */
+const S = {
+  page:'feed', token:null, filter:'all',
+  feed:null, queue:null, docs:null, comps:null,
+  open:new Set(), edits:{}, poll:null, busy:false,
+  draft:{competitor:'',text:'',by:''}, blob:null, blobMs:0,
+};
+const $  = (s,r=document)=>r.querySelector(s);
+const el = document.getElementById.bind(document);
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const CONFIGURED = !/YOUR-N8N-HOST/.test(ENDPOINT);
+
+/* ═══════════════════ transport ═══════════════════ */
+async function api(action, payload = {}, tries = 2) {
+  const body = { action, ...payload };
+  if (S.token) body.token = S.token;
+  let last;
+  for (let i = 0; i < tries; i++) {
+    try {
+      const ctl = new AbortController();
+      const kill = setTimeout(() => ctl.abort(), 90000);
+      const r = await fetch(ENDPOINT, {
+        method:'POST', headers:{'content-type':'application/json'},
+        body:JSON.stringify(body), signal:ctl.signal,
+      });
+      clearTimeout(kill);
+      const txt = await r.text();
+      let d; try { d = JSON.parse(txt); }
+      catch { throw new Error(r.ok ? 'The server sent something that was not JSON.' : 'Server error ' + r.status); }
+      if (r.status === 401) { S.token = null; throw new Error(d.error || 'Session expired. Sign in again.'); }
+      if (!r.ok || d.ok === false) throw new Error(d.error || 'Request failed (' + r.status + ').');
+      el('pip').classList.add('live');
+      return d;
+    } catch (e) {
+      last = e;
+      const retryable = e.name === 'AbortError' || /Failed to fetch|NetworkError|load failed/i.test(e.message);
+      if (!retryable || i === tries - 1) break;
+      await new Promise(r => setTimeout(r, 900 * (i + 1)));
+    }
+  }
+  el('pip').classList.remove('live');
+  if (last && (last.name === 'AbortError' || /Failed to fetch|NetworkError|load failed/i.test(last.message)))
+    throw new Error("Can't reach the workflow. Check that Factors Intel 2 is Active in n8n and the URL is the Production one.");
+  throw last;
+}
+function toast(m){ const t=el('toast'); t.textContent=m; t.classList.add('up'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('up'),3400); }
+
+/* ═══════════════════ helpers ═══════════════════ */
+function ago(iso){
+  if(!iso) return '';
+  const d=new Date(iso.endsWith('Z')||iso.includes('+')?iso:iso+'Z');
+  if(isNaN(d)) return '';
+  const m=Math.floor((Date.now()-d)/60000);
+  if(m<1) return 'just now';
+  if(m<60) return m+'m ago';
+  if(m<1440) return Math.floor(m/60)+'h ago';
+  if(m<10080) return Math.floor(m/1440)+'d ago';
+  return d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+}
+const MARK   = {launch:'+', gap:'!', intel:'~'};
+const SRCNAME= {watcher:'watch', oliv:'oliv', field:'field'};
+
+/* ═══════════════════ router ═══════════════════ */
+function go(p){
+  S.page=p;
+  document.querySelectorAll('#nav button').forEach(b=>
+    b.dataset.p===p ? b.setAttribute('aria-current','page') : b.removeAttribute('aria-current'));
+  if(location.hash.slice(1)!==p) history.replaceState(null,'','#'+p);
+  clearInterval(S.poll); S.poll=null;
+  render(); load();
+}
+addEventListener('hashchange',()=>{ const h=location.hash.slice(1); if(h&&h!==S.page) go(h); });
+
+async function load(){
+  if(!CONFIGURED) return;   // no endpoint yet — don't hammer a host that cannot exist
+  const p=S.page;
+  try{
+    if(p==='feed'){        const d=await api('feed.list',{kind:S.filter,limit:80}); S.feed=d.items||[]; }
+    else if(p==='submit'){ if(!S.comps){ const d=await api('competitors.list'); S.comps=d.competitors||[]; } }
+    else if(p==='review'){ if(!S.token) return; const d=await api('review.list');
+                           S.queue=(d.items||[]).map(i=>({...i,id:Number(i.id)})); startPoll(); }
+    else if(p==='collateral'){ if(!S.token) return; const d=await api('collateral.get'); S.docs=d.docs||[]; }
+  }catch(e){ if(S.page===p) return render(e.message); }
+  if(S.page===p) render();
+}
+function startPoll(){
+  clearInterval(S.poll);
+  S.poll=setInterval(async()=>{
+    if(S.page!=='review'||!S.token||S.busy) return;
+    if(!(S.queue||[]).some(i=>i.status==='processing'||i.status==='analyzing')) return;
+    try{ const d=await api('review.list',{},1); S.queue=(d.items||[]).map(i=>({...i,id:Number(i.id)})); render(); }catch(e){}
+  },12000);
+}
+
+/* ═══════════════════ views ═══════════════════ */
+function render(err){
+  const m=el('main');
+  if(!CONFIGURED){ m.innerHTML=setupView(); return; }
+  const banner = err ? `<div class="msg bad">${esc(err)}</div>` : '';
+  m.innerHTML =
+      S.page==='feed'       ? banner+feedView()
+    : S.page==='submit'     ? banner+submitView()
+    : S.page==='review'     ? (S.token ? banner+reviewView() : gateView(err))
+    : S.page==='collateral' ? (S.token ? banner+docsView()   : gateView(err))
+    : feedView();
+  restoreDraft();
+}
+
+const setupView = ()=>`
+  <div class="head"><span class="tag">Setup — one step left</span>
+  <h1>Point it at n8n.</h1>
+  <p>Open <code>index.html</code>, find the <code>ENDPOINT</code> line near the top, and paste the Production webhook URL from the <b>App Request</b> node in <b>Factors Intel 2 — App API</b>. Redeploy and this screen disappears.</p></div>
+  <div class="empty"><strong>Nothing is connected yet</strong>This app has no data of its own — everything comes from that one URL.</div>`;
+
+/* ── feed ───────────────────────────────────────────────────────── */
+function feedView(){
+  const F=[['all','Everything'],['launch','Launches'],['gap','Feature gaps'],['intel','Field notes']];
+  const chips=F.map(([k,l])=>`<button class="chip" aria-pressed="${S.filter===k}" onclick="setFilter('${k}')">${l}</button>`).join('');
+  let list;
+  if(S.feed===null) list='<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+  else if(!S.feed.length) list=`<div class="empty"><strong>${S.filter==='all'?'The feed is empty':'Nothing in this filter yet'}</strong>The watcher sweeps competitor pages every six hours. Field notes appear here the moment a rep submits one.</div>`;
+  else list=S.feed.map(rowFeed).join('');
+  return `<div class="head"><span class="tag">Competitor intelligence</span>
+    <h1>What moved.</h1>
+    <p>Product launches picked up from competitor changelogs, feature gaps heard on calls, and notes from the field — newest first.</p></div>
+    <div class="filters">${chips}</div>${list}`;
+}
+function rowFeed(i){
+  const src=SRCNAME[i.source]||i.source;
+  return `<article class="rec${i.severity==='high'?' hot':''}">
+    <div class="rec-g"><span class="rec-m">${MARK[i.kind]||'~'}</span><span class="rec-s">${esc(src)}</span></div>
+    <div class="rec-b">
+      <div class="rec-h"><span class="who">${esc(i.competitor_name||'Unattributed')}</span><span class="tag">${esc(ago(i.at))}</span></div>
+      <h2 class="rec-t">${i.url?`<a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.headline)}</a>`:esc(i.headline)}</h2>
+      ${i.summary?`<p class="rec-p">${esc(i.summary)}</p>`:''}
+    </div></article>`;
+}
+function setFilter(k){ S.filter=k; S.feed=null; render(); load(); }
+
+/* ── submit ─────────────────────────────────────────────────────── */
+function submitView(){
+  const opts=(S.comps||[]).map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+  return `<div class="head"><span class="tag">From the field</span>
+    <h1>Heard something?</h1>
+    <p>Write it down or say it out loud. It goes to the review queue, gets compared against what the collateral already says, and a reviewer decides whether it ships.</p></div>
+    <div class="row two">
+      <div><label class="lbl tag" for="f-c">Competitor</label>
+        <select class="fld" id="f-c" onchange="S.draft.competitor=this.value">
+          <option value="">Choose one…</option>${opts}</select></div>
+      <div><label class="lbl tag" for="f-b">Your name</label>
+        <input class="fld" id="f-b" placeholder="So the reviewer can ask you about it" oninput="S.draft.by=this.value"></div>
+    </div>
+    <div class="row"><div><label class="lbl tag" for="f-t">What you heard</label>
+      <textarea class="fld" id="f-t" placeholder="Acme said 6sense can't attribute pipeline without piping everything into Snowflake first — that's why they're looking at us." oninput="S.draft.text=this.value"></textarea></div></div>
+    <div class="row"><div><span class="lbl tag">Or record it</span>
+      <div class="mic" id="mic">
+        <button class="btn ghost" id="mic-b" onclick="toggleRec()">Start recording</button>
+        <div class="meter" id="meter">${'<i></i>'.repeat(22)}</div>
+        <span class="clock" id="clock">0:00</span>
+        <span class="tag" id="mic-s">up to 3 min</span>
+      </div></div></div>
+    <button class="btn" id="go" onclick="submitNote()">Send to review</button>`;
+}
+function restoreDraft(){
+  if(S.page!=='submit') return;
+  const c=el('f-c'), t=el('f-t'), b=el('f-b');
+  if(c&&S.draft.competitor) c.value=S.draft.competitor;
+  if(t&&S.draft.text) t.value=S.draft.text;
+  if(b&&S.draft.by) b.value=S.draft.by;
+  if(S.blob) markRecorded();
+}
+
+/* ── recorder ───────────────────────────────────────────────────── */
+let MR=null, chunks=[], ticker=null, audioCtx=null, t0=0;
+async function toggleRec(){
+  if(MR&&MR.state==='recording'){ MR.stop(); return; }
+  if(!navigator.mediaDevices||!window.MediaRecorder){
+    toast('This browser can\u2019t record. Type the note instead.'); return;
+  }
+  let stream;
+  try{ stream=await navigator.mediaDevices.getUserMedia({audio:true}); }
+  catch(e){ toast('Microphone blocked. Allow it in your browser, or type the note.'); return; }
+
+  chunks=[]; S.blob=null;
+  const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(m=>MediaRecorder.isTypeSupported(m))||'';
+  MR=new MediaRecorder(stream, mime?{mimeType:mime}:undefined);
+  MR.ondataavailable=e=>{ if(e.data.size) chunks.push(e.data); };
+  MR.onstop=()=>{
+    stream.getTracks().forEach(t=>t.stop());
+    clearInterval(ticker); if(audioCtx){audioCtx.close();audioCtx=null;}
+    S.blob=new Blob(chunks,{type:mime||'audio/webm'}); S.blobMs=Date.now()-t0;
+    el('mic').classList.remove('armed');
+    document.querySelectorAll('#meter i').forEach(b=>b.style.height='3px');
+    markRecorded();
+  };
+  MR.start(); t0=Date.now();
+  el('mic').classList.add('armed');
+  el('mic-b').textContent='Stop'; el('mic-b').classList.add('rec-on'); el('mic-b').classList.remove('ghost');
+  el('mic-s').textContent='recording';
+  ticker=setInterval(()=>{
+    const s=Math.floor((Date.now()-t0)/1000);
+    el('clock').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+    if(s>=180){ toast('Stopped at 3 minutes.'); MR.stop(); }
+  },250);
+  meterOn(stream);
+}
+function meterOn(stream){
+  try{
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const an=audioCtx.createAnalyser(); an.fftSize=64;
+    audioCtx.createMediaStreamSource(stream).connect(an);
+    const data=new Uint8Array(an.frequencyBinCount);
+    const bars=[...document.querySelectorAll('#meter i')];
+    (function tick(){
+      if(!audioCtx||audioCtx.state==='closed') return;
+      an.getByteFrequencyData(data);
+      bars.forEach((b,i)=>{
+        const v=data[Math.floor(i*data.length/bars.length)]/255;
+        b.style.height=Math.max(3,v*26)+'px';
+        b.style.background=v>0.06?'#fff':'var(--line-3)';
+      });
+      requestAnimationFrame(tick);
+    })();
+  }catch(e){}
+}
+function markRecorded(){
+  const s=Math.round(S.blobMs/1000);
+  el('mic-b').textContent='Record again'; el('mic-b').classList.remove('rec-on'); el('mic-b').classList.add('ghost');
+  el('mic-s').innerHTML=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} captured · <button class="lnk" onclick="dropRec()">discard</button>`;
+  el('clock').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+}
+function dropRec(){ S.blob=null; S.blobMs=0; el('mic-b').textContent='Start recording'; el('mic-s').textContent='up to 3 min'; el('clock').textContent='0:00'; }
+const toB64 = b => new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=()=>rej(new Error('Could not read the recording.')); r.readAsDataURL(b); });
+
+async function submitNote(){
+  const btn=el('go'); if(btn.disabled) return;
+  const competitor=el('f-c').value, text=el('f-t').value.trim(), by=el('f-b').value.trim();
+  if(!competitor) return toast('Pick a competitor first.');
+  if(!text && !S.blob) return toast('Write a note or record one.');
+  btn.disabled=true; btn.textContent=S.blob?'Transcribing…':'Sending…';
+  try{
+    const p={competitor,text,submitted_by:by||'anonymous'};
+    if(S.blob){ p.audio_base64=await toB64(S.blob); p.audio_mime=S.blob.type||'audio/webm'; }
+    const d=await api('submit.create',p,1);
+    S.draft={competitor:'',text:'',by:''}; S.blob=null; S.blobMs=0; S.queue=null;
+    render(); toast(d.message||'Queued for review.');
+  }catch(e){
+    // The typed note survives the failure — it is still on screen and in S.draft.
+    S.draft={competitor,text,by};
+    toast(e.message);
+  }finally{ btn.disabled=false; btn.textContent='Send to review'; }
+}
+
+/* ── gate ───────────────────────────────────────────────────────── */
+const gateView = err=>`
+  <div class="gate">
+    <h2>Reviewers only</h2>
+    <p>Publishing edits live sales collateral, so this bit is behind a shared password.</p>
+    ${err?`<div class="msg bad" style="text-align:left">${esc(err)}</div>`:''}
+    <input class="fld" id="g-u" placeholder="ID" autocomplete="username" onkeydown="if(event.key==='Enter')signIn()">
+    <input class="fld" id="g-p" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')signIn()">
+    <button class="btn" style="width:100%" id="g-b" onclick="signIn()">Sign in</button>
+  </div>`;
+async function signIn(){
+  const b=el('g-b'); b.disabled=true; b.textContent='Checking…';
+  try{
+    const d=await api('auth.login',{userId:el('g-u').value.trim(),password:el('g-p').value},1);
+    S.token=d.token; render(); load();
+  }catch(e){ render(e.message); }
+  finally{ const n=el('g-b'); if(n){n.disabled=false;n.textContent='Sign in';} }
+}
+
+/* ── review ─────────────────────────────────────────────────────── */
+function reviewView(){
+  let list;
+  if(S.queue===null) list='<div class="skel"></div><div class="skel"></div>';
+  else if(!S.queue.length) list=`<div class="empty"><strong>Queue is clear</strong>New submissions and gaps pulled from calls land here within a minute or two.</div>`;
+  else list=S.queue.map(cardReview).join('');
+  return `<div class="head"><span class="tag">Review queue</span>
+    <h1>Approve the delta.</h1>
+    <p>Each item shows what the collateral says today and what is proposed on top. Edit the wording, drop what doesn't belong, then publish — the existing copy is appended to, never rewritten.</p></div>${list}`;
+}
+function cardReview(it){
+  const busy = it.status==='processing'||it.status==='analyzing';
+  const open = S.open.has(it.id);
+  const bl   = S.edits[it.id] ?? (Array.isArray(it.proposed_bullets)?it.proposed_bullets:[]);
+  const badge= busy?'<span class="state wait">Analysing</span>'
+             : it.status==='error'?'<span class="state">Needs a look</span>'
+             : `<span class="state go">${bl.length} line${bl.length===1?'':'s'}</span>`;
+
+  const cur=(it.collateral||'').split('\n')
+    .filter(l=>l.trim()&&!l.trim().startsWith('#'))
+    .map(l=>`<div class="dline">  ${esc(l.replace(/\s*<!--.*?-->\s*/g,'').replace(/^[-*]\s*/,'· '))}</div>`).join('')
+    || '<div class="dline">  <b>(this section is empty)</b></div>';
+
+  const adds=bl.map((b,i)=>`<div class="bul">
+      <span class="plus">+</span>
+      <textarea rows="2" oninput="editBullet(${it.id},${i},this.value)" aria-label="Proposed line ${i+1}">${esc(b)}</textarea>
+      <button class="x" onclick="dropBullet(${it.id},${i})" aria-label="Remove line ${i+1}">×</button>
+    </div>`).join('');
+
+  return `<div class="card${open?' open':''}">
+    <button class="card-h" onclick="toggle(${it.id})" aria-expanded="${open}">
+      <span class="caret">›</span>
+      <span class="tw">
+        <div class="tt">${esc(it.competitor_name||'Unattributed')} · ${esc(it.target_section||'Feature gaps')}</div>
+        <span class="tag">${esc(SRCNAME[it.source]||it.source)} · ${esc(it.submitted_by||'—')} · ${esc(ago(it.at))}</span>
+      </span>${badge}
+    </button>
+    <div class="card-b">
+      ${busy?`<div class="msg">Comparing this against the collateral. It refreshes on its own.</div>`:''}
+      ${it.status==='error'?`<div class="msg bad">Automatic analysis didn't run for this one, so the lines below are the raw submission. Read them closely before publishing.</div>`:''}
+      ${(it.raw_input||it.transcript)?`<div class="sub"><span class="tag">Submitted</span><p class="rec-p">${esc(it.transcript||it.raw_input)}</p></div>`:''}
+      <div class="sub"><span class="tag">Collateral today</span></div>
+      <div class="diff">${cur}</div>
+      <div class="sub"><span class="tag">Proposed additions — edit freely</span></div>
+      ${adds||'<div class="dline" style="margin-bottom:var(--s3)">  <b>(nothing proposed — this looks already covered)</b></div>'}
+      <button class="btn ghost mini" onclick="addBullet(${it.id})">+ Add a line</button>
+      <div class="acts">
+        <button class="btn" onclick="publish(${it.id})" ${busy||!bl.length?'disabled':''}>Publish to collateral</button>
+        <button class="btn ghost" onclick="saveEdits(${it.id})" ${busy?'disabled':''}>Save edits</button>
+        <span class="spacer"></span>
+        <button class="btn ghost" onclick="dismiss(${it.id})" ${busy?'disabled':''}>Dismiss</button>
+      </div>
+    </div></div>`;
+}
+function bulletsOf(id){
+  const it=(S.queue||[]).find(x=>x.id===id)||{};
+  return S.edits[id] ?? (Array.isArray(it.proposed_bullets)?[...it.proposed_bullets]:[]);
+}
+function toggle(id){ S.open.has(id)?S.open.delete(id):S.open.add(id); render(); }
+function editBullet(id,i,v){ const b=bulletsOf(id); b[i]=v; S.edits[id]=b; }   /* no re-render: keeps the caret put */
+function dropBullet(id,i){ const b=bulletsOf(id); b.splice(i,1); S.edits[id]=b; render(); }
+function addBullet(id){ S.edits[id]=[...bulletsOf(id),'']; S.open.add(id); render(); }
+
+async function act(id, action, extra, done){
+  if(S.busy) return; S.busy=true;
+  try{
+    const it=(S.queue||[]).find(x=>x.id===id)||{};
+    const d=await api(action,{id,competitor:it.competitor_name,section:it.target_section||'Feature gaps',...extra},1);
+    toast(d.message||'Done.');
+    if(done){ delete S.edits[id]; S.open.delete(id); S.queue=null; S.docs=null; S.feed=null; render(); await load(); }
+  }catch(e){ toast(e.message); if(!S.token) render(e.message); }
+  finally{ S.busy=false; }
+}
+function publish(id){
+  const b=bulletsOf(id).map(s=>s.trim()).filter(Boolean);
+  if(!b.length) return toast('Nothing to publish — every line is empty.');
+  act(id,'review.publish',{bullets:b},true);
+}
+function saveEdits(id){ act(id,'review.update',{bullets:bulletsOf(id).map(s=>s.trim()).filter(Boolean)},false); }
+function dismiss(id){ if(confirm('Dismiss this? It leaves the queue and nothing gets published.')) act(id,'review.reject',{reason:'dismissed by reviewer'},true); }
+
+/* ── collateral ─────────────────────────────────────────────────── */
+function docsView(){
+  let list;
+  if(S.docs===null) list='<div class="skel" style="height:160px"></div>';
+  else if(!S.docs.length) list=`<div class="empty"><strong>No collateral yet</strong>Publish something from the review queue and it shows up here.</div>`;
+  else list=S.docs.map(d=>{
+    const lines=(d.content||'').split('\n').filter(l=>l.trim().startsWith('-')).map(l=>{
+      const stamp=(l.match(/<!--\s*([\d-]+)\s*-->/)||[])[1]||'';
+      return `<li><span class="d">${esc(stamp)}</span><span>${esc(l.replace(/<!--.*?-->/g,'').replace(/^-\s*/,'').trim())}</span></li>`;
+    }).join('');
+    return `<div class="doc"><h3>${esc(d.competitor_name)}</h3>
+      <span class="tag">${esc(d.section)} · v${esc(d.version)} · updated ${esc(ago(d.at))}</span>
+      ${lines?`<ul>${lines}</ul>`:'<p class="rec-p" style="margin-top:var(--s3)">Nothing published into this section yet.</p>'}</div>`;
+  }).join('');
+  return `<div class="head"><span class="tag">Live collateral</span>
+    <h1>What the deck says.</h1>
+    <p class="no-print">Every line here was reviewed by a person before it landed. Print this to PDF and it's your battlecard — every version is kept, so nothing is ever lost.</p></div>
+    <div class="filters no-print"><button class="chip" onclick="window.print()">Export as PDF</button></div>${list}`;
+}
+
+/* ═══════════════════ boot ═══════════════════ */
+const start=location.hash.slice(1);
+go(['feed','submit','review','collateral'].includes(start)?start:'feed');
+</script>
+</body>
+</html>
