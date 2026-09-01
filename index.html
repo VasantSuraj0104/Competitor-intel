@@ -716,7 +716,7 @@ function cardReview(it){
       </div>
       <div class="row">${picker}</div>
 
-      <div class="acts" style="margin-top:0;border-top:0;padding-top:0">
+      <div class="acts" style="margin:0 0 var(--s6);border-top:0;padding-top:0">
         <button class="btn ghost" onclick="draftWithAI(${it.id})" ${e.drafting||!comp?'disabled':''}>
           ${e.drafting?'Drafting…':'Draft with AI'}</button>
         <span class="tag">Reads the note against this deck and fills the fields below</span>
