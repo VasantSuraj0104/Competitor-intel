@@ -233,6 +233,13 @@ select.fld{
 }
 .bul .x:hover,.bul .b:hover{border-color:var(--pure);color:var(--pure)}
 .bul .b[aria-pressed="true"]{background:var(--pure);color:var(--ink);border-color:var(--pure)}
+.was{
+  border:1px solid var(--line);border-radius:var(--r-sm);background:rgba(255,255,255,.02);
+  padding:var(--s3);font-size:var(--fs-xs);line-height:1.6;color:var(--faint);
+  white-space:pre-wrap;overflow-wrap:anywhere;margin-bottom:var(--s2);
+  user-select:text;cursor:default;
+}
+.was:empty::before{content:'(empty today)';font-style:italic}
 .sws{display:flex;flex-direction:column;gap:2px;flex-shrink:0;margin-top:var(--s1)}
 .sw{width:var(--s5);height:var(--s3);border-radius:3px;border:1px solid var(--line-2);cursor:pointer;padding:0}
 .sw[aria-pressed="true"]{box-shadow:0 0 0 1px var(--ink),0 0 0 2px var(--pure)}
@@ -610,7 +617,7 @@ async function signIn(){
    inside a cell and leave the next one black, so a cell cannot be a
    plain string without losing what the deck says today. */
 const edOf = id => S.ed[id] || (S.ed[id] = {
-  mode:'existing', feature:'', after:'', competitor:'', feats:null, seeded:false, from:null,
+  mode:'existing', feature:'', after:'', competitor:'', feats:null, drafting:false, why:'',
   competitor_value:[{text:'',colour:'black'}],
   factors_value:[{text:'',colour:'black'}],
 });
@@ -641,23 +648,6 @@ function dropLine(id,side,i){
 }
 function addLine(id,side){ edOf(id)[side].push({text:'',colour:'black'}); render(); }
 
-function suggestionBlock(it, e){
-  const s = it.suggestion;
-  if(!s) return it.status==='pending'
-    ? `<div class="msg">Working out a suggested update. It appears here on its own.</div>` : '';
-  if(s.mode==='none') return `<div class="msg">Nothing in this note changes the deck.${
-    s.why?' '+esc(s.why):''} Publish only if you disagree.</div>`;
-  return `<div class="sub">
-    <span class="tag">Suggested update — ${esc(s.mode==='new'?'new feature':'existing feature')}: ${esc(s.feature)}</span>
-    <div class="diff">
-      <div class="dline"><b>${esc(e.competitor||'Competitor')}</b>  ${esc(s.competitor_value)||'(unchanged)'}</div>
-      <div class="dline"><b>Factors</b>  ${esc(s.factors_value)||'(unchanged)'}</div>
-      ${s.why?`<div class="dline" style="margin-top:var(--s2)">${esc(s.why)}</div>`:''}
-    </div>
-    <button class="btn ghost mini" onclick="resetToSuggestion(${it.id})">Reset to suggestion</button>
-  </div>`;
-}
-
 /* ── review ─────────────────────────────────────────────────────── */
 function reviewView(){
   let list;
@@ -674,10 +664,13 @@ function cardReview(it){
   const comp=e.competitor||it.target_competitor||it.competitor_name||'';
   const badge = busy ? '<span class="state wait">Analysing</span>'
              : e.feature ? `<span class="state go">${esc(e.feature)}</span>`
-             : it.suggestion ? '<span class="state go">Suggested</span>'
-             : it.status==='pending' ? '<span class="state wait">Thinking</span>'
              : '<span class="state">Needs a target</span>';
   const opts=(S.comps||[]).map(c=>`<option ${c.name===comp?'selected':''}>${esc(c.name)}</option>`).join('');
+  const f0=(e.feats||[]).find(x=>x.feature===e.feature);
+  const cur={
+    competitor: f0 ? f0.competitor_value.map(l=>l.text).join('\n') : '',
+    factors:    f0 ? f0.factors_value.map(l=>l.text).join('\n')    : '',
+  };
 
   let picker;
   if(!comp) picker='<div class="dline">  pick a competitor first</div>';
@@ -709,7 +702,6 @@ function cardReview(it){
     </button>
     <div class="card-b">
       ${it.status==='error'?`<div class="msg bad">Automatic analysis didn't run for this one. Read the note closely before publishing.</div>`:''}
-      ${suggestionBlock(it, e)}
       ${it.raw_input?`<div class="sub"><span class="tag">The note</span><p class="rec-p">${esc(it.raw_input)}</p></div>`:''}
 
       <div class="row two">
@@ -724,11 +716,22 @@ function cardReview(it){
       </div>
       <div class="row">${picker}</div>
 
-      <div class="sub"><span class="tag">${esc(comp||'Competitor')}</span></div>
+      <div class="acts" style="margin-top:0;border-top:0;padding-top:0">
+        <button class="btn ghost" onclick="draftWithAI(${it.id})" ${e.drafting||!comp?'disabled':''}>
+          ${e.drafting?'Drafting…':'Draft with AI'}</button>
+        <span class="tag">Reads the note against this deck and fills the fields below</span>
+      </div>
+      ${e.why?`<div class="msg">${esc(e.why)}</div>`:''}
+
+      <div class="sub"><span class="tag">${esc(comp||'Competitor')} — in the deck today</span>
+        <div class="was">${esc(cur.competitor)}</div>
+        <span class="tag">New copy</span></div>
       ${lineRows(it.id,'competitor_value',e.competitor_value)}
       <button class="btn ghost mini" onclick="addLine(${it.id},'competitor_value')">+ Add a line</button>
 
-      <div class="sub" style="margin-top:var(--s6)"><span class="tag">Factors</span></div>
+      <div class="sub" style="margin-top:var(--s6)"><span class="tag">Factors — in the deck today</span>
+        <div class="was">${esc(cur.factors)}</div>
+        <span class="tag">New copy</span></div>
       ${lineRows(it.id,'factors_value',e.factors_value)}
       <button class="btn ghost mini" onclick="addLine(${it.id},'factors_value')">+ Add a line</button>
 
@@ -746,29 +749,10 @@ async function toggle(id){
   const it=(S.queue||[]).find(x=>x.id===id)||{};
   const e=edOf(id);
   if(!e.competitor) e.competitor=it.target_competitor||it.competitor_name||'';
-  applySuggestion(e, it);
   render();
   if(e.competitor && e.feats===null) await loadFeats(id);
 }
 
-/* The suggestion is a starting point, not an answer. It is applied once, on
-   first open, and never re-applied — otherwise a re-render would throw away
-   whatever the reviewer had already typed over it. */
-function applySuggestion(e, it){
-  const s = it.suggestion;
-  if(!s || e.seeded) return;
-  e.seeded = true;
-  e.from = s;
-  if(s.mode === 'none') return;          // model saw no deck change; leave blank
-  e.mode = s.mode === 'new' ? 'new' : 'existing';
-  if(s.feature) e.feature = s.feature;
-  if(s.competitor_value) e.competitor_value = [{text:s.competitor_value, colour:'black'}];
-  if(s.factors_value)    e.factors_value    = [{text:s.factors_value,    colour:'black'}];
-}
-function resetToSuggestion(id){
-  const e=edOf(id); if(!e.from) return;
-  e.seeded=false; applySuggestion(e, {suggestion:e.from}); render();
-}
 async function loadFeats(id){
   const e=edOf(id);
   try{ const d=await api('features.get',{competitor:e.competitor},1); e.feats=d.features||[]; }
@@ -790,6 +774,7 @@ function setMode(id,m){
    reviewer edits the real copy instead of retyping it from memory. */
 function pickFeature(id,name){
   const e=edOf(id), f=(e.feats||[]).find(x=>x.feature===name);
+  e.why='';
   // if they pick the row the model suggested, keep the suggested copy
   if(e.from && e.from.feature===name && e.from.mode!=='none'){
     e.feature=name;
@@ -803,6 +788,33 @@ function pickFeature(id,name){
   render();
 }
 const clean = ls => ls.map(l=>({text:l.text.trim(),colour:l.colour})).filter(l=>l.text);
+
+/* On demand, not on a timer. Nothing is spent on a note nobody opens, and the
+   reviewer sees the deck's current copy beside the draft rather than under it. */
+async function draftWithAI(id){
+  const e=edOf(id);
+  if(e.drafting) return;
+  if(!e.competitor) return toast('Pick a competitor first.');
+  e.drafting=true; e.why=''; render();
+  try{
+    const it=(S.queue||[]).find(x=>x.id===id)||{};
+    const d=await api('review.suggest',{id, competitor:e.competitor, text:it.raw_input},1);
+    const s=d.suggestion||{};
+    if(s.mode==='none'){
+      e.why='Nothing in this note changes the deck.'+(s.why?' '+s.why:'');
+    }else{
+      e.mode = s.mode==='new' ? 'new' : 'existing';
+      if(s.feature){
+        e.feature=s.feature;
+        if(e.mode==='existing' && !(e.feats||[]).some(x=>x.feature===s.feature)) e.mode='new';
+      }
+      e.competitor_value = s.competitor_value ? [{text:s.competitor_value,colour:'black'}] : e.competitor_value;
+      e.factors_value    = s.factors_value    ? [{text:s.factors_value,   colour:'black'}] : e.factors_value;
+      e.why = s.why||'';
+    }
+  }catch(err){ toast(err.message); }
+  finally{ e.drafting=false; render(); }
+}
 
 async function publish(id){
   if(S.busy) return;
