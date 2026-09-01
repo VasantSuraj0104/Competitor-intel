@@ -394,6 +394,7 @@ table.dk .v{width:calc((100% - 230px)/2)}
       <button onclick="go('submit')"   data-p="submit">Submit</button>
       <button onclick="go('review')"   data-p="review">Review</button>
       <button onclick="go('features')" data-p="features">Features</button>
+      <button onclick="signOut()" data-p="signout" id="out" hidden>Sign out</button>
     </nav>
   </div>
 </header>
@@ -406,7 +407,7 @@ table.dk .v{width:calc((100% - 230px)/2)}
 "use strict";
 /* ═══════════════════ state ═══════════════════ */
 const S = {
-  page:'feed', token:null, filter:'all',
+  page:'feed', token:null, filter:'all',   // token is restored just below
   feed:null, queue:null, comps:null,
   comp:'', feats:null,          // the Features page
   ed:{},                        // per-queue-item editor state
@@ -415,8 +416,26 @@ const S = {
 };
 const $  = (s,r=document)=>r.querySelector(s);
 const el = document.getElementById.bind(document);
+
+/* Stay signed in across refreshes. This gates publishing to live sales decks,
+   so the token is not kept forever: it carries its own expiry, and a 401 from
+   the server (password changed, say) clears it on the spot. */
+const KEY='fi.session', DAYS=30;
+function saveSession(t){
+  try{ localStorage.setItem(KEY, JSON.stringify({t, until: Date.now()+DAYS*864e5})); }catch(e){}
+}
+function loadSession(){
+  try{
+    const s=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(s && s.t && s.until > Date.now()) return s.t;
+    localStorage.removeItem(KEY);
+  }catch(e){}
+  return null;
+}
+function clearSession(){ try{ localStorage.removeItem(KEY); }catch(e){} }
 const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const CONFIGURED = !/YOUR-N8N-HOST/.test(ENDPOINT);
+S.token = loadSession();
 
 /* ═══════════════════ transport ═══════════════════ */
 async function api(action, payload = {}, tries = 2) {
@@ -435,7 +454,7 @@ async function api(action, payload = {}, tries = 2) {
       const txt = await r.text();
       let d; try { d = JSON.parse(txt); }
       catch { throw new Error(r.ok ? 'The server sent something that was not JSON.' : 'Server error ' + r.status); }
-      if (r.status === 401) { S.token = null; throw new Error(d.error || 'Session expired. Sign in again.'); }
+      if (r.status === 401) { S.token = null; clearSession(); throw new Error(d.error || 'Session expired. Sign in again.'); }
       if (!r.ok || d.ok === false) throw new Error(d.error || d.message || 'Request failed (' + r.status + ').');
       el('pip').classList.add('live');
       return d;
@@ -512,6 +531,7 @@ function render(err){
   const m=el('main');
   if(!CONFIGURED){ m.innerHTML=setupView(); return; }
   const banner = err ? `<div class="msg bad">${esc(err)}</div>` : '';
+  const so=el('out'); if(so) so.hidden = !S.token;
   m.innerHTML =
       S.page==='feed'     ? banner+feedView()
     : S.page==='submit'   ? banner+submitView()
@@ -602,11 +622,15 @@ const gateView = err=>`
     <input class="fld" id="g-p" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')signIn()">
     <button class="btn" style="width:100%" id="g-b" onclick="signIn()">Sign in</button>
   </div>`;
+function signOut(){
+  S.token=null; clearSession(); S.queue=null; S.feats=null; S.comp=''; S.ed={}; S.open.clear();
+  go('feed'); toast('Signed out.');
+}
 async function signIn(){
   const b=el('g-b'); b.disabled=true; b.textContent='Checking…';
   try{
     const d=await api('auth.login',{userId:el('g-u').value.trim(),password:el('g-p').value},1);
-    S.token=d.token; render(); load();
+    S.token=d.token; saveSession(d.token); render(); load();
   }catch(e){ render(e.message); }
   finally{ const n=el('g-b'); if(n){n.disabled=false;n.textContent='Sign in';} }
 }
