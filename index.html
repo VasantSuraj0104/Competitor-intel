@@ -136,6 +136,16 @@ a{color:inherit}
 .rec.hot .rec-g{background:var(--pure)}
 .rec.hot .rec-m,.rec.hot .rec-s{color:var(--ink)}
 .rec-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--s2);margin-bottom:var(--s2)}
+/* Oliv rows carry a deep link into the recording at the exact timestamp the
+   competitor came up. It sits in the header rather than inside the summary:
+   the summary is prose a reviewer reads, this is an action they take. */
+.rec-h .src{
+  margin-left:auto; font-family:var(--mono); font-size:var(--fs-micro);
+  letter-spacing:.06em; text-transform:uppercase; color:var(--mute);
+  text-decoration:none; border:1px solid var(--line-2); border-radius:var(--r-pill);
+  padding:2px var(--s3); white-space:nowrap; transition:all .15s var(--ease);
+}
+.rec-h .src:hover{color:var(--pure);border-color:var(--line-3);background:var(--raised)}
 .rec-h .who{font-weight:500;font-size:var(--fs-xs);color:var(--pure);letter-spacing:0}
 .rec-t{
   font-size:var(--fs-h2); font-weight:400; letter-spacing:-.008em;
@@ -565,8 +575,10 @@ function rowFeed(i){
   return `<article class="rec${i.severity==='high'?' hot':''}">
     <div class="rec-g"><span class="rec-m">${MARK[i.kind]||'~'}</span><span class="rec-s">${esc(src)}</span></div>
     <div class="rec-b">
-      <div class="rec-h"><span class="who">${esc(i.competitor_name||'Unattributed')}</span><span class="tag">${esc(ago(i.at))}</span></div>
-      <h2 class="rec-t">${i.url?`<a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.headline)}</a>`:esc(i.headline)}</h2>
+      <div class="rec-h"><span class="who">${esc(i.competitor_name||'Unattributed')}</span><span class="tag">${esc(ago(i.at))}</span>${
+        i.source==='oliv' && i.url ? `<a class="src" href="${esc(i.url)}" target="_blank" rel="noopener"
+          title="Opens the call in Oliv at the moment this was said">Transcript &#8599;</a>` : ''}</div>
+      <h2 class="rec-t">${esc(i.headline)}</h2>
       ${i.summary?`<p class="rec-p">${esc(i.summary)}</p>`:''}
     </div></article>`;
 }
